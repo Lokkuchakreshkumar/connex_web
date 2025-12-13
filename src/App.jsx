@@ -11,8 +11,15 @@ function cn(...inputs) {
 }
 
 function App() {
-  const [activeIndex, setActiveIndex] = useState(null);
+  const [hoveredIndex, setHoveredIndex] = useState(null);
+  const [defaultIndex, setDefaultIndex] = useState(null);
   const [isStruck, setIsStruck] = useState(false);
+  const [platform, setPlatform] = useState('');
+
+  const [isMobile, setIsMobile] = useState(false);
+
+  // Derived active index: prioritize hover, fallback to default
+  const activeIndex = hoveredIndex !== null ? hoveredIndex : defaultIndex;
 
   // Callback when lightning strikes
   const handleStrike = useCallback(() => {
@@ -22,6 +29,28 @@ function App() {
       console.log('5 seconds passed, setting isStruck to false');
       setIsStruck(false);
     }, 5000); // Keep text red for 5 seconds
+  }, []);
+
+  useEffect(() => {
+    const userAgent = window.navigator.userAgent.toLowerCase();
+    const platformInfo = window.navigator.platform.toLowerCase();
+
+    if (userAgent.includes('android')) {
+      setPlatform('Android');
+      setIsMobile(true);
+    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
+      setPlatform('iOS');
+      setIsMobile(true);
+    } else if (platformInfo.includes('win') || userAgent.includes('windows')) {
+      setPlatform('Windows');
+      setDefaultIndex(0);
+    } else if (platformInfo.includes('mac') || userAgent.includes('macintosh')) {
+      setPlatform('macOS');
+      setDefaultIndex(1);
+    } else if (platformInfo.includes('linux') || userAgent.includes('linux')) {
+      setPlatform('Linux');
+      setDefaultIndex(2);
+    }
   }, []);
 
   return (
@@ -73,6 +102,26 @@ function App() {
             The ultimate automation tool for captive portals. <br className="hidden md:block" />
             Connect instantly without the interruption.
           </p>
+
+          {platform && (
+            <motion.div
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: 0.2 }}
+              className={cn(
+                "mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm backdrop-blur-sm",
+                isMobile
+                  ? "bg-red-500/10 border-red-500/20 text-red-200"
+                  : "bg-white/5 border-white/10 text-gray-400"
+              )}
+            >
+              {isMobile ? (
+                <span>Connex is not supported on <span className="font-medium text-white">{platform}</span>. Please install Connex on your laptop.</span>
+              ) : (
+                <span>We have detected you're using <span className="text-white font-medium">{platform}</span>, so download <span className="text-[#D91223] font-medium">{platform}</span>.</span>
+              )}
+            </motion.div>
+          )}
         </motion.div>
 
         {/* Command Palette Style Downloads */}
@@ -90,8 +139,8 @@ function App() {
               label="Download for Windows"
               subLabel="x64 / ARM64"
               isActive={activeIndex === 0}
-              onMouseEnter={() => setActiveIndex(0)}
-              onMouseLeave={() => setActiveIndex(null)}
+              onMouseEnter={() => setHoveredIndex(0)}
+              onMouseLeave={() => setHoveredIndex(null)}
             />
             <DownloadItem
               href="https://github.com/Lokkuchakreshkumar/connex/releases/download/macos/connex-macos"
@@ -99,8 +148,8 @@ function App() {
               label="Download for macOS"
               subLabel="Universal"
               isActive={activeIndex === 1}
-              onMouseEnter={() => setActiveIndex(1)}
-              onMouseLeave={() => setActiveIndex(null)}
+              onMouseEnter={() => setHoveredIndex(1)}
+              onMouseLeave={() => setHoveredIndex(null)}
             />
             <DownloadItem
               href="https://github.com/Lokkuchakreshkumar/connex/releases/download/linux/connex-linux"
@@ -108,8 +157,8 @@ function App() {
               label="Download for Linux"
               subLabel=".deb / .rpm"
               isActive={activeIndex === 2}
-              onMouseEnter={() => setActiveIndex(2)}
-              onMouseLeave={() => setActiveIndex(null)}
+              onMouseEnter={() => setHoveredIndex(2)}
+              onMouseLeave={() => setHoveredIndex(null)}
             />
           </div>
 
