@@ -1,6 +1,6 @@
 
-import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import React, { useState, useEffect, useRef, useCallback } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Lock, Monitor, ArrowRight, Command, Terminal } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
@@ -11,33 +11,63 @@ function cn(...inputs) {
 
 function App() {
   const [activeIndex, setActiveIndex] = useState(null);
+  const [isStruck, setIsStruck] = useState(false);
+
+  // Callback when lightning strikes
+  const handleStrike = useCallback(() => {
+    console.log('Lightning strike! Setting isStruck to true');
+    setIsStruck(true);
+    setTimeout(() => {
+      console.log('5 seconds passed, setting isStruck to false');
+      setIsStruck(false);
+    }, 5000); // Keep text red for 5 seconds
+  }, []);
 
   return (
     <div className="min-h-screen w-full bg-[#050505] text-white font-sans selection:bg-red-500/30 flex flex-col items-center relative overflow-hidden">
 
-      {/* Subtle Background Gradients */}
+
+      {/* Subtle Background Gradients - Reverted to Red/Orange */}
       <div className="fixed inset-0 pointer-events-none">
         <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] mix-blend-screen" />
         <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[120px] mix-blend-screen" />
       </div>
 
+      {/* Realistic Lightning Canvas Overlay */}
+      <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
+        <RealisticLightning onStrike={handleStrike} />
+      </div>
+
+      <div className="absolute top-6 right-6 z-50">
+        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-400 backdrop-blur-sm">
+          <span className="w-1.5 h-1.5 rounded-full bg-[#D91223] animate-pulse"></span>
+          v1.0.0
+        </div>
+      </div>
+
       <main className="relative z-10 w-full max-w-3xl px-6 pt-32 pb-20 flex flex-col items-center text-center">
+
+
+
 
         {/* Header Section */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-12"
+          className="mb-12 relative"
         >
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-400 mb-6 backdrop-blur-sm">
-            <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse"></span>
-            v1.0.0 Available Now
+          <div className="relative inline-block">
+            <motion.h1
+              className={cn(
+                "text-5xl md:text-7xl font-bold tracking-tight mb-6 transition-all duration-800 ease-in-out",
+                isStruck ? "text-[#D91223] drop-shadow-[0_0_35px_rgba(217,18,35,0.8)]" : "text-white drop-shadow-sm"
+              )}
+            >
+              Connex
+            </motion.h1>
           </div>
 
-          <h1 className="text-5xl md:text-7xl font-bold tracking-tight mb-6 bg-clip-text text-transparent bg-gradient-to-b from-white to-white/60">
-            Connex
-          </h1>
           <p className="text-xl text-gray-400 max-w-xl mx-auto leading-relaxed">
             The ultimate automation tool for captive portals. <br className="hidden md:block" />
             Connect instantly without the interruption.
@@ -95,13 +125,13 @@ function App() {
         {/* Features Grid */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 w-full">
           <Feature
-            icon={<Zap className="w-5 h-5 text-amber-400" />}
+            icon={<Zap className="w-5 h-5 text-[#D91223]" />}
             title="Auto-Login"
             desc="Detects captive portals and logs you in instantly."
             delay={0.4}
           />
           <Feature
-            icon={<Lock className="w-5 h-5 text-red-500" />}
+            icon={<Lock className="w-5 h-5 text-[#D91223]" />}
             title="Secure Vault"
             desc="Credentials are encrypted and stored locally."
             delay={0.5}
@@ -117,6 +147,139 @@ function App() {
       </main>
     </div>
   );
+}
+
+// --- Realistic Lightning Component ---
+function RealisticLightning({ onStrike }) {
+  const canvasRef = useRef(null);
+  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
+
+  useEffect(() => {
+    const updateSize = () => {
+      if (canvasRef.current) {
+        const { innerWidth, innerHeight } = window;
+        setDimensions({ width: innerWidth, height: innerHeight });
+        canvasRef.current.width = innerWidth;
+        canvasRef.current.height = innerHeight;
+      }
+    };
+    window.addEventListener('resize', updateSize);
+    updateSize();
+    return () => window.removeEventListener('resize', updateSize);
+  }, []);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    let animationFrameId;
+    let lightningBolts = [];
+    let lastStrikeTime = 0;
+    const STRIKE_INTERVAL = 10000; // Strike every 10 seconds (5s active + 5s wait)
+
+    // Lightning Bolt Class
+    class Bolt {
+      constructor(x, y, targetX, targetY) {
+        this.segments = [];
+        this.opacity = 1;
+        this.life = 0;
+        this.maxLife = 15 + Math.random() * 10; // Slightly faster strike
+
+        this.generateSegments(x, y, targetX, targetY, 200);
+      }
+
+      generateSegments(x1, y1, x2, y2, displace) {
+        if (displace < 2) {
+          this.segments.push({ x1, y1, x2, y2 });
+          return;
+        }
+
+        let midX = (x1 + x2) / 2;
+        let midY = (y1 + y2) / 2;
+
+        // Offset perpendicular to the line
+        midX += (Math.random() - 0.5) * displace;
+        midY += (Math.random() - 0.5) * displace;
+
+        this.generateSegments(x1, y1, midX, midY, displace / 2);
+        this.generateSegments(midX, midY, x2, y2, displace / 2);
+      }
+
+      draw(ctx) {
+        ctx.beginPath();
+        for (let s of this.segments) {
+          ctx.moveTo(s.x1, s.y1);
+          ctx.lineTo(s.x2, s.y2);
+        }
+
+        // Main Bolt Color: #D91223 (RGB: 217, 18, 35)
+        ctx.strokeStyle = `rgba(217, 18, 35, ${this.opacity})`;
+        ctx.lineWidth = 2.5;
+        ctx.shadowBlur = 30;
+        ctx.shadowColor = "rgba(217, 18, 35, 0.9)";
+        ctx.stroke();
+
+        // Inner Core (White/Pinkish for intensity)
+        ctx.strokeStyle = `rgba(255, 200, 200, ${this.opacity})`;
+        ctx.lineWidth = 1;
+        ctx.shadowBlur = 5;
+        ctx.stroke();
+      }
+
+      update() {
+        this.life++;
+        // Rapid flicker
+        this.opacity = Math.random() > 0.4 ? 1 : 0.2;
+
+        // Fade out at the end
+        if (this.life > this.maxLife - 5) {
+          this.opacity = (this.maxLife - this.life) / 5;
+        }
+
+        return this.life < this.maxLife;
+      }
+    }
+
+    const loop = (timestamp) => {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Randomly spawn lightning
+      if (timestamp - lastStrikeTime > STRIKE_INTERVAL) {
+        // Target the "Connex" header area
+        const targetX = canvas.width / 2;
+        const targetY = 220;
+
+        // Start from top, random X
+        const startX = targetX + (Math.random() - 0.5) * 600;
+
+        // Spawn multiple branches for "really good" effect
+        lightningBolts.push(new Bolt(startX, -50, targetX, targetY));
+        if (Math.random() > 0.5) {
+          lightningBolts.push(new Bolt(startX, -50, targetX + (Math.random() - 0.5) * 100, targetY + 50));
+        }
+
+        lastStrikeTime = timestamp;
+
+        // Trigger the text effect
+        onStrike();
+      }
+
+      // Update and draw bolts
+      lightningBolts = lightningBolts.filter(bolt => {
+        const alive = bolt.update();
+        if (alive) bolt.draw(ctx);
+        return alive;
+      });
+
+      animationFrameId = requestAnimationFrame(loop);
+    };
+
+    animationFrameId = requestAnimationFrame(loop);
+
+    return () => cancelAnimationFrame(animationFrameId);
+  }, [onStrike]);
+
+  return <canvas ref={canvasRef} className="w-full h-full" />;
 }
 
 function DownloadItem({ icon, label, subLabel, isActive, href, onMouseEnter, onMouseLeave }) {
@@ -187,3 +350,4 @@ const LinuxIcon = () => (
 );
 
 export default App;
+
