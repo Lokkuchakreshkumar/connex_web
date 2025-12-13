@@ -134,7 +134,7 @@ function App() {
           {/* List Items */}
           <div className="p-2 flex flex-col gap-1">
             <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/win/connex-win.exe"
+              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/winV2/connex-win.exe"
               icon={<WindowsIcon />}
               label="Download for Windows"
               subLabel="x64 / ARM64"
@@ -143,7 +143,7 @@ function App() {
               onMouseLeave={() => setHoveredIndex(null)}
             />
             <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/macos/connex-macos"
+              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/macosV2/connex-macos"
               icon={<AppleIcon />}
               label="Download for macOS"
               subLabel="Universal"
@@ -152,7 +152,7 @@ function App() {
               onMouseLeave={() => setHoveredIndex(null)}
             />
             <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/linux/connex-linux"
+              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/linuxv2/connex-linux"
               icon={<FaLinux />}
               label="Download for Linux"
               subLabel=".deb / .rpm"
