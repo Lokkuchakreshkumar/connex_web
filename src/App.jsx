@@ -4,6 +4,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Zap, Lock, Monitor, ArrowRight, Command, Terminal } from 'lucide-react';
 import { clsx } from 'clsx';
 import { twMerge } from 'tailwind-merge';
+import { FaLinux } from "react-icons/fa";
 
 function cn(...inputs) {
   return twMerge(clsx(inputs));
@@ -38,10 +39,10 @@ function App() {
         <RealisticLightning onStrike={handleStrike} />
       </div>
 
-      <div className="absolute top-6 right-6 z-50">
+      <div className="fixed top-6 right-6 z-50">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-400 backdrop-blur-sm">
-          <span className="w-1.5 h-1.5 rounded-full bg-[#D91223] animate-pulse"></span>
-          v1.0.0
+          <div className="w-1.5 h-1.5 rounded-full bg-[#D91223] animate-pulse"></div>
+          <span className="leading-none">v1.0.0</span>
         </div>
       </div>
 
@@ -103,7 +104,7 @@ function App() {
             />
             <DownloadItem
               href="https://github.com/Lokkuchakreshkumar/connex/releases/download/linux/connex-linux"
-              icon={<LinuxIcon />}
+              icon={<FaLinux />}
               label="Download for Linux"
               subLabel=".deb / .rpm"
               isActive={activeIndex === 2}
@@ -137,7 +138,7 @@ function App() {
             delay={0.5}
           />
           <Feature
-            icon={<Monitor className="w-5 h-5 text-blue-400" />}
+            icon={<Monitor className="w-5 h-5 text-[#D91223]" />}
             title="Cross Platform"
             desc="Works seamlessly on Windows, macOS, and Linux."
             delay={0.6}
