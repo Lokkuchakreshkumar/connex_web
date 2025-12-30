@@ -1,403 +1,514 @@
+import React, { useState } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import {
+    Download, Wifi, Shield, Battery,
+    ChevronDown, Smartphone, Settings, ArrowRight
+} from 'lucide-react';
 
-import React, { useState, useEffect, useRef, useCallback } from 'react';
-import { motion, AnimatePresence } from 'framer-motion';
-import { Zap, Lock, Monitor, ArrowRight, Command, Terminal } from 'lucide-react';
-import { clsx } from 'clsx';
-import { twMerge } from 'tailwind-merge';
-import { FaLinux } from "react-icons/fa";
+// Smooth stagger animation config
+const staggerContainer = {
+    hidden: { opacity: 0 },
+    show: {
+        opacity: 1,
+        transition: {
+            staggerChildren: 0.1,
+            delayChildren: 0.2
+        }
+    }
+};
 
-function cn(...inputs) {
-  return twMerge(clsx(inputs));
-}
+const fadeInUp = {
+    hidden: { opacity: 0, y: 30 },
+    show: {
+        opacity: 1,
+        y: 0,
+        transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }
+    }
+};
+
+const scaleIn = {
+    hidden: { opacity: 0, scale: 0.95 },
+    show: {
+        opacity: 1,
+        scale: 1,
+        transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }
+    }
+};
 
 function App() {
-  const [hoveredIndex, setHoveredIndex] = useState(null);
-  const [defaultIndex, setDefaultIndex] = useState(null);
-  const [isStruck, setIsStruck] = useState(false);
-  const [platform, setPlatform] = useState('');
+    const [hoveredFeature, setHoveredFeature] = useState(null);
+    const { scrollYProgress } = useScroll();
+    const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
-  const [isMobile, setIsMobile] = useState(false);
+    const features = [
+        {
+            icon: <Wifi className="w-6 h-6" />,
+            title: "Auto Wi-Fi Login",
+            desc: "Automatically detects captive portals and logs you in without any manual intervention.",
+            color: "emerald"
+        },
+        {
+            icon: <Settings className="w-6 h-6" />,
+            title: "Background Service",
+            desc: "Runs silently in the background. No need to open the app after initial setup.",
+            color: "teal"
+        },
+        {
+            icon: <Shield className="w-6 h-6" />,
+            title: "Secure Storage",
+            desc: "Credentials encrypted and stored locally on your device. Your data stays private.",
+            color: "cyan"
+        },
+        {
+            icon: <Battery className="w-6 h-6" />,
+            title: "Battery Optimized",
+            desc: "Uses minimal resources with smart detection only when connecting to networks.",
+            color: "green"
+        }
+    ];
 
-  // Derived active index: prioritize hover, fallback to default
-  const activeIndex = hoveredIndex !== null ? hoveredIndex : defaultIndex;
+    const steps = [
+        { num: "01", title: "Download & Install", desc: "Get the APK and install it on your Android device" },
+        { num: "02", title: "Add Credentials", desc: "Enter your captive portal username and password" },
+        { num: "03", title: "Forget About It", desc: "Connex handles everything automatically from now on" }
+    ];
 
-  // Callback when lightning strikes
-  const handleStrike = useCallback(() => {
-    console.log('Lightning strike! Setting isStruck to true');
-    setIsStruck(true);
-    setTimeout(() => {
-      console.log('5 seconds passed, setting isStruck to false');
-      setIsStruck(false);
-    }, 5000); // Keep text red for 5 seconds
-  }, []);
+    return (
+        <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
 
-  useEffect(() => {
-    const userAgent = window.navigator.userAgent.toLowerCase();
-    const platformInfo = window.navigator.platform.toLowerCase();
-
-    if (userAgent.includes('android')) {
-      setPlatform('Android');
-      setIsMobile(true);
-    } else if (userAgent.includes('iphone') || userAgent.includes('ipad') || userAgent.includes('ipod')) {
-      setPlatform('iOS');
-      setIsMobile(true);
-    } else if (platformInfo.includes('win') || userAgent.includes('windows')) {
-      setPlatform('Windows');
-      setDefaultIndex(0);
-    } else if (platformInfo.includes('mac') || userAgent.includes('macintosh')) {
-      setPlatform('macOS');
-      setDefaultIndex(1);
-    } else if (platformInfo.includes('linux') || userAgent.includes('linux')) {
-      setPlatform('Linux');
-      setDefaultIndex(2);
-    }
-  }, []);
-
-  return (
-    <div className="min-h-screen w-full bg-[#050505] text-white font-sans selection:bg-red-500/30 flex flex-col items-center relative overflow-hidden">
-
-
-      {/* Subtle Background Gradients - Reverted to Red/Orange */}
-      <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-[-10%] left-[20%] w-[500px] h-[500px] bg-red-500/10 rounded-full blur-[120px] mix-blend-screen" />
-        <div className="absolute bottom-[-10%] right-[20%] w-[500px] h-[500px] bg-orange-500/5 rounded-full blur-[120px] mix-blend-screen" />
-      </div>
-
-      {/* Realistic Lightning Canvas Overlay */}
-      <div className="absolute inset-0 pointer-events-none z-20 overflow-hidden">
-        <RealisticLightning onStrike={handleStrike} />
-      </div>
-
-      <div className="fixed top-6 right-6 z-50">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs font-medium text-gray-400 backdrop-blur-sm">
-          <div className="w-1.5 h-1.5 rounded-full bg-[#D91223] animate-pulse"></div>
-          <span className="leading-none">v1.0.0</span>
-        </div>
-      </div>
-
-      <main className="relative z-10 w-full max-w-3xl px-6 pt-32 pb-20 flex flex-col items-center text-center">
-
-
-
-
-        {/* Header Section */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, ease: "easeOut" }}
-          className="mb-12 relative"
-        >
-          <div className="relative inline-block">
-            <motion.h1
-              className={cn(
-                "text-5xl md:text-7xl font-bold tracking-tight mb-6 transition-all duration-800 ease-in-out",
-                isStruck ? "text-[#D91223] drop-shadow-[0_0_35px_rgba(217,18,35,0.8)]" : "text-white drop-shadow-sm"
-              )}
-            >
-              Connex
-            </motion.h1>
-          </div>
-
-          <p className="text-xl text-gray-400 max-w-xl mx-auto leading-relaxed">
-            The ultimate automation tool for captive portals. <br className="hidden md:block" />
-            Connect instantly without the interruption.
-          </p>
-
-          {platform && (
-            <motion.div
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 0.2 }}
-              className={cn(
-                "mt-6 inline-flex items-center gap-2 px-4 py-2 rounded-lg border text-sm backdrop-blur-sm",
-                isMobile
-                  ? "bg-red-500/10 border-red-500/20 text-red-200"
-                  : "bg-white/5 border-white/10 text-gray-400"
-              )}
-            >
-              {isMobile ? (
-                <span>Connex is not supported on <span className="font-medium text-white">{platform}</span>. Please install Connex on your laptop.</span>
-              ) : (
-                <span>We have detected you're using <span className="text-white font-medium">{platform}</span>, so download <span className="text-[#D91223] font-medium">{platform}</span>.</span>
-              )}
-            </motion.div>
-          )}
-        </motion.div>
-
-        {/* Command Palette Style Downloads */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.95 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5, delay: 0.2 }}
-          className="w-full max-w-xl bg-[#111111]/80 backdrop-blur-xl border border-white/10 rounded-xl overflow-hidden shadow-2xl shadow-black/50"
-        >
-          {/* List Items */}
-          <div className="p-2 flex flex-col gap-1">
-            <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/winV2/connex-win.exe"
-              icon={<WindowsIcon />}
-              label="Download for Windows"
-              subLabel="x64 / ARM64"
-              isActive={activeIndex === 0}
-              onMouseEnter={() => setHoveredIndex(0)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            />
-            <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/macosV2/connex-macos"
-              icon={<AppleIcon />}
-              label="Download for macOS"
-              subLabel="Universal"
-              isActive={activeIndex === 1}
-              onMouseEnter={() => setHoveredIndex(1)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            />
-            <DownloadItem
-              href="https://github.com/Lokkuchakreshkumar/connex/releases/download/linuxv2/connex-linux"
-              icon={<FaLinux />}
-              label="Download for Linux"
-              subLabel=".deb / .rpm"
-              isActive={activeIndex === 2}
-              onMouseEnter={() => setHoveredIndex(2)}
-              onMouseLeave={() => setHoveredIndex(null)}
-            />
-          </div>
-
-          {/* Footer of Palette */}
-          <div className="px-4 py-2 bg-white/5 border-t border-white/5 flex items-center justify-between text-[10px] text-gray-500 font-medium uppercase tracking-wider">
-            <span>Select to download</span>
-            <div className="flex items-center gap-2">
-              <span className="flex items-center gap-1"><Command className="w-3 h-3" /> Open</span>
-              <span className="flex items-center gap-1"><ArrowRight className="w-3 h-3" /> Select</span>
+            {/* Animated background gradient that responds to scroll */}
+            <div className="fixed inset-0 pointer-events-none">
+                <motion.div
+                    className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[150px]"
+                    animate={{
+                        x: [0, 50, 0],
+                        y: [0, 30, 0],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                />
+                <motion.div
+                    className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-[120px]"
+                    animate={{
+                        x: [0, -30, 0],
+                        y: [0, -20, 0],
+                    }}
+                    transition={{
+                        duration: 15,
+                        repeat: Infinity,
+                        ease: "linear"
+                    }}
+                />
             </div>
-          </div>
-        </motion.div>
 
-        {/* Features Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mt-24 w-full">
-          <Feature
-            icon={<Zap className="w-5 h-5 text-[#D91223]" />}
-            title="Auto-Login"
-            desc="Detects captive portals and logs you in instantly."
-            delay={0.4}
-          />
-          <Feature
-            icon={<Lock className="w-5 h-5 text-[#D91223]" />}
-            title="Secure Vault"
-            desc="Credentials are encrypted and stored locally."
-            delay={0.5}
-          />
-          <Feature
-            icon={<Monitor className="w-5 h-5 text-[#D91223]" />}
-            title="Cross Platform"
-            desc="Works seamlessly on Windows, macOS, and Linux."
-            delay={0.6}
-          />
+            {/* Header with scroll-based background */}
+            <motion.header
+                className="fixed top-0 left-0 right-0 z-50 border-b border-transparent"
+                style={{
+                    backgroundColor: `rgba(10, 10, 10, ${headerOpacity})`,
+                    backdropFilter: 'blur(12px)',
+                    borderColor: `rgba(255, 255, 255, 0.05)`
+                }}
+            >
+                <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
+                    <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0, x: -20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                    >
+                        <img src="/connex-icon.png" alt="Connex" className="w-10 h-10 rounded-xl" />
+                        <span className="text-xl font-bold tracking-tight">Connex</span>
+                    </motion.div>
+
+                    <motion.a
+                        href="#download"
+                        className="group relative px-5 py-2.5 rounded-full bg-emerald-500 text-sm font-semibold overflow-hidden"
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.5 }}
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        <span className="relative z-10">Download</span>
+                        <motion.div
+                            className="absolute inset-0 bg-emerald-400"
+                            initial={{ x: '-100%' }}
+                            whileHover={{ x: 0 }}
+                            transition={{ duration: 0.3 }}
+                        />
+                    </motion.a>
+                </div>
+            </motion.header>
+
+            {/* Hero Section */}
+            <section className="relative z-10 min-h-screen flex items-center pt-20">
+                <div className="max-w-6xl mx-auto px-6 w-full grid lg:grid-cols-2 gap-16 items-center">
+
+                    {/* Left Content */}
+                    <motion.div
+                        variants={staggerContainer}
+                        initial="hidden"
+                        animate="show"
+                        className="text-center lg:text-left"
+                    >
+                        {/* Badge */}
+                        <motion.div
+                            variants={fadeInUp}
+                            className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
+                        >
+                            <motion.div
+                                className="w-2 h-2 rounded-full bg-emerald-500"
+                                animate={{ opacity: [1, 0.5, 1] }}
+                                transition={{ duration: 2, repeat: Infinity }}
+                            />
+                            <span className="text-sm text-emerald-400 font-medium">Android Only • v1.0.0</span>
+                        </motion.div>
+
+                        {/* Title */}
+                        <motion.h1
+                            variants={fadeInUp}
+                            className="text-4xl sm:text-5xl lg:text-6xl font-bold tracking-tight mb-6 leading-tight"
+                        >
+                            Never Touch{' '}
+                            <span className="text-emerald-500">Captive Portals</span>{' '}
+                            Again
+                        </motion.h1>
+
+                        {/* Description */}
+                        <motion.p
+                            variants={fadeInUp}
+                            className="text-lg text-gray-400 max-w-lg mx-auto lg:mx-0 mb-8 leading-relaxed"
+                        >
+                            Connex automatically detects and logs into Wi-Fi captive portals.
+                            Set it up once, and never deal with login pages again.
+                        </motion.p>
+
+                        {/* CTA Button with hover effect */}
+                        <motion.div variants={fadeInUp} className="mb-10">
+                            <motion.a
+                                href="#download"
+                                className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-emerald-500 text-lg font-semibold relative overflow-hidden"
+                                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(16, 185, 129, 0.3)" }}
+                                whileTap={{ scale: 0.98 }}
+                            >
+                                <Download className="w-5 h-5 relative z-10" />
+                                <span className="relative z-10">Download APK</span>
+                                <motion.div
+                                    className="absolute right-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"
+                                >
+                                    <ArrowRight className="w-5 h-5" />
+                                </motion.div>
+                            </motion.a>
+                        </motion.div>
+
+                        {/* Stats with count-up effect */}
+                        <motion.div
+                            variants={fadeInUp}
+                            className="flex gap-8 justify-center lg:justify-start text-center lg:text-left"
+                        >
+                            {[
+                                { value: "<10MB", label: "Lightweight" },
+                                { value: "0", label: "Ads" },
+                                { value: "Free", label: "Forever" }
+                            ].map((stat, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 20 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: 0.8 + i * 0.1 }}
+                                >
+                                    <div className="text-2xl font-bold text-white">{stat.value}</div>
+                                    <div className="text-sm text-gray-500">{stat.label}</div>
+                                </motion.div>
+                            ))}
+                        </motion.div>
+                    </motion.div>
+
+                    {/* Right - Phone Mockup */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6, delay: 0.3 }}
+                        className="flex justify-center lg:justify-end"
+                    >
+                        <div className="relative">
+                            {/* Glow effect behind phone */}
+                            <div className="absolute inset-0 bg-gradient-to-b from-emerald-500/20 to-transparent blur-3xl scale-150 -z-10" />
+
+                            {/* Phone Frame */}
+                            <div className="relative w-[280px] sm:w-[300px]">
+                                <div className="relative bg-gradient-to-b from-gray-800 to-gray-900 rounded-[2.5rem] p-2 shadow-2xl shadow-black/50 border border-white/10">
+                                    {/* Screen */}
+                                    <div className="bg-black rounded-[2rem] overflow-hidden">
+                                        <img
+                                            src="/app-screenshot.jpg"
+                                            alt="Connex App"
+                                            className="w-full h-auto"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </motion.div>
+                </div>
+
+                {/* Scroll Indicator */}
+                <motion.div
+                    className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2 text-gray-500"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 1.5 }}
+                >
+                    <span className="text-xs">Scroll to explore</span>
+                    <motion.div
+                        animate={{ y: [0, 8, 0] }}
+                        transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                    >
+                        <ChevronDown className="w-4 h-4" />
+                    </motion.div>
+                </motion.div>
+            </section>
+
+            {/* Features Section */}
+            <section className="relative z-10 py-24 px-6">
+                <div className="max-w-6xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6 }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                            Features that make life easier
+                        </h2>
+                        <p className="text-gray-500 max-w-xl mx-auto">
+                            Designed for students, professionals, and anyone tired of repetitive captive portal logins.
+                        </p>
+                    </motion.div>
+
+                    <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-6">
+                        {features.map((feature, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ delay: index * 0.1, duration: 0.5 }}
+                                onMouseEnter={() => setHoveredFeature(index)}
+                                onMouseLeave={() => setHoveredFeature(null)}
+                                className="group relative p-6 rounded-2xl bg-white/[0.02] border border-white/5 cursor-pointer overflow-hidden"
+                            >
+                                {/* Hover gradient */}
+                                <motion.div
+                                    className="absolute inset-0 bg-gradient-to-br from-emerald-500/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+                                />
+
+                                {/* Animated border on hover */}
+                                <motion.div
+                                    className="absolute inset-0 rounded-2xl"
+                                    style={{
+                                        border: '1px solid transparent',
+                                        background: hoveredFeature === index
+                                            ? 'linear-gradient(#0a0a0a, #0a0a0a) padding-box, linear-gradient(135deg, rgba(16, 185, 129, 0.5), transparent, rgba(20, 184, 166, 0.5)) border-box'
+                                            : 'none'
+                                    }}
+                                    initial={false}
+                                    animate={{ opacity: hoveredFeature === index ? 1 : 0 }}
+                                    transition={{ duration: 0.3 }}
+                                />
+
+                                <div className="relative z-10">
+                                    <motion.div
+                                        className="w-12 h-12 rounded-xl bg-emerald-500/10 flex items-center justify-center mb-4 text-emerald-500"
+                                        whileHover={{ scale: 1.1, rotate: 5 }}
+                                        transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                                    >
+                                        {feature.icon}
+                                    </motion.div>
+                                    <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors duration-300">
+                                        {feature.title}
+                                    </h3>
+                                    <p className="text-sm text-gray-500 leading-relaxed">{feature.desc}</p>
+                                </div>
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* How It Works */}
+            <section className="relative z-10 py-24 px-6">
+                <div className="max-w-4xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6 }}
+                        className="text-center mb-16"
+                    >
+                        <h2 className="text-3xl sm:text-4xl font-bold mb-4">
+                            How it works
+                        </h2>
+                        <p className="text-gray-500">Three simple steps to WiFi freedom</p>
+                    </motion.div>
+
+                    <div className="grid md:grid-cols-3 gap-8">
+                        {steps.map((step, index) => (
+                            <motion.div
+                                key={index}
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true, margin: "-50px" }}
+                                transition={{ delay: index * 0.15, duration: 0.5 }}
+                                whileHover={{ y: -5 }}
+                                className="group relative p-8 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 transition-colors duration-300"
+                            >
+                                {/* Step number with gradient */}
+                                <motion.div
+                                    className="text-6xl font-bold mb-4 bg-gradient-to-br from-emerald-500/30 to-transparent bg-clip-text text-transparent"
+                                    whileHover={{ scale: 1.05 }}
+                                >
+                                    {step.num}
+                                </motion.div>
+                                <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-emerald-400 transition-colors duration-300">
+                                    {step.title}
+                                </h3>
+                                <p className="text-gray-500">{step.desc}</p>
+
+                                {/* Connector line (except last) */}
+                                {index < 2 && (
+                                    <motion.div
+                                        className="hidden md:block absolute top-1/2 -right-4 w-8 h-[2px] bg-gradient-to-r from-emerald-500/50 to-transparent"
+                                        initial={{ scaleX: 0 }}
+                                        whileInView={{ scaleX: 1 }}
+                                        viewport={{ once: true }}
+                                        transition={{ delay: 0.5 + index * 0.2 }}
+                                    />
+                                )}
+                            </motion.div>
+                        ))}
+                    </div>
+                </div>
+            </section>
+
+            {/* Download Section */}
+            <section id="download" className="relative z-10 py-24 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true, margin: "-100px" }}
+                        transition={{ duration: 0.6 }}
+                        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 border border-emerald-500/20 p-8 sm:p-12 text-center"
+                    >
+                        {/* Animated gradient border */}
+                        <motion.div
+                            className="absolute inset-0 rounded-3xl opacity-50"
+                            style={{
+                                background: 'linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent)',
+                                backgroundSize: '200% 100%'
+                            }}
+                            animate={{
+                                backgroundPosition: ['200% 0', '-200% 0']
+                            }}
+                            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
+                        />
+
+                        {/* Icon */}
+                        <motion.img
+                            src="/connex-icon.png"
+                            alt="Connex"
+                            className="w-20 h-20 mx-auto mb-6 rounded-2xl"
+                            whileHover={{ scale: 1.05, rotate: 3 }}
+                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                        />
+
+                        <motion.h2
+                            className="text-3xl sm:text-4xl font-bold text-white mb-4"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2 }}
+                        >
+                            Download Connex
+                        </motion.h2>
+
+                        <motion.p
+                            className="text-gray-400 max-w-md mx-auto mb-8"
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.3 }}
+                        >
+                            Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
+                        </motion.p>
+
+                        {/* Download Button */}
+                        <motion.a
+                            href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/connext/connex.apk"
+                            className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold relative overflow-hidden"
+                            whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.2)" }}
+                            whileTap={{ scale: 0.98 }}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.4 }}
+                        >
+                            <Download className="w-5 h-5" />
+                            Download APK
+                            <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
+                        </motion.a>
+
+                        {/* Requirements */}
+                        <motion.div
+                            className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500"
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5 }}
+                        >
+                            <span className="flex items-center gap-2">
+                                <Smartphone className="w-4 h-4" />
+                                Android 8.0+
+                            </span>
+                            <span>•</span>
+                            <span>&lt;10MB</span>
+                            <span>•</span>
+                            <span>No root required</span>
+                        </motion.div>
+                    </motion.div>
+                </div>
+            </section>
+
+            {/* Footer */}
+            <footer className="relative z-10 py-8 px-6 border-t border-white/5">
+                <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+                    <motion.div
+                        className="flex items-center gap-3"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        <img src="/connex-icon.png" alt="Connex" className="w-8 h-8 rounded-lg" />
+                        <span className="font-semibold">Connex</span>
+                    </motion.div>
+                    <motion.span
+                        className="text-sm text-gray-500"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        v1.0.0 • Made for hassle-free WiFi
+                    </motion.span>
+                </div>
+            </footer>
         </div>
-
-      </main>
-    </div>
-  );
+    );
 }
-
-// --- Realistic Lightning Component ---
-function RealisticLightning({ onStrike }) {
-  const canvasRef = useRef(null);
-  const [dimensions, setDimensions] = useState({ width: 0, height: 0 });
-
-  useEffect(() => {
-    const updateSize = () => {
-      if (canvasRef.current) {
-        const { innerWidth, innerHeight } = window;
-        setDimensions({ width: innerWidth, height: innerHeight });
-        canvasRef.current.width = innerWidth;
-        canvasRef.current.height = innerHeight;
-      }
-    };
-    window.addEventListener('resize', updateSize);
-    updateSize();
-    return () => window.removeEventListener('resize', updateSize);
-  }, []);
-
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext('2d');
-    let animationFrameId;
-    let lightningBolts = [];
-    let lastStrikeTime = 0;
-    const STRIKE_INTERVAL = 10000; // Strike every 10 seconds (5s active + 5s wait)
-
-    // Lightning Bolt Class
-    class Bolt {
-      constructor(x, y, targetX, targetY) {
-        this.segments = [];
-        this.opacity = 1;
-        this.life = 0;
-        this.maxLife = 15 + Math.random() * 10; // Slightly faster strike
-
-        this.generateSegments(x, y, targetX, targetY, 200);
-      }
-
-      generateSegments(x1, y1, x2, y2, displace) {
-        if (displace < 2) {
-          this.segments.push({ x1, y1, x2, y2 });
-          return;
-        }
-
-        let midX = (x1 + x2) / 2;
-        let midY = (y1 + y2) / 2;
-
-        // Offset perpendicular to the line
-        midX += (Math.random() - 0.5) * displace;
-        midY += (Math.random() - 0.5) * displace;
-
-        this.generateSegments(x1, y1, midX, midY, displace / 2);
-        this.generateSegments(midX, midY, x2, y2, displace / 2);
-      }
-
-      draw(ctx) {
-        ctx.beginPath();
-        for (let s of this.segments) {
-          ctx.moveTo(s.x1, s.y1);
-          ctx.lineTo(s.x2, s.y2);
-        }
-
-        // Main Bolt Color: #D91223 (RGB: 217, 18, 35)
-        ctx.strokeStyle = `rgba(217, 18, 35, ${this.opacity})`;
-        ctx.lineWidth = 2.5;
-        ctx.shadowBlur = 30;
-        ctx.shadowColor = "rgba(217, 18, 35, 0.9)";
-        ctx.stroke();
-
-        // Inner Core (White/Pinkish for intensity)
-        ctx.strokeStyle = `rgba(255, 200, 200, ${this.opacity})`;
-        ctx.lineWidth = 1;
-        ctx.shadowBlur = 5;
-        ctx.stroke();
-      }
-
-      update() {
-        this.life++;
-        // Rapid flicker
-        this.opacity = Math.random() > 0.4 ? 1 : 0.2;
-
-        // Fade out at the end
-        if (this.life > this.maxLife - 5) {
-          this.opacity = (this.maxLife - this.life) / 5;
-        }
-
-        return this.life < this.maxLife;
-      }
-    }
-
-    const loop = (timestamp) => {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
-
-      // Randomly spawn lightning
-      if (timestamp - lastStrikeTime > STRIKE_INTERVAL) {
-        // Target the "Connex" header area
-        const targetX = canvas.width / 2;
-        const targetY = 220;
-
-        // Start from top, random X
-        const startX = targetX + (Math.random() - 0.5) * 600;
-
-        // Spawn multiple branches for "really good" effect
-        lightningBolts.push(new Bolt(startX, -50, targetX, targetY));
-        if (Math.random() > 0.5) {
-          lightningBolts.push(new Bolt(startX, -50, targetX + (Math.random() - 0.5) * 100, targetY + 50));
-        }
-
-        lastStrikeTime = timestamp;
-
-        // Trigger the text effect
-        onStrike();
-      }
-
-      // Update and draw bolts
-      lightningBolts = lightningBolts.filter(bolt => {
-        const alive = bolt.update();
-        if (alive) bolt.draw(ctx);
-        return alive;
-      });
-
-      animationFrameId = requestAnimationFrame(loop);
-    };
-
-    animationFrameId = requestAnimationFrame(loop);
-
-    return () => cancelAnimationFrame(animationFrameId);
-  }, [onStrike]);
-
-  return <canvas ref={canvasRef} className="w-full h-full" />;
-}
-
-function DownloadItem({ icon, label, subLabel, isActive, href, onMouseEnter, onMouseLeave }) {
-  return (
-    <a
-      href={href}
-      onMouseEnter={onMouseEnter}
-      onMouseLeave={onMouseLeave}
-      className={cn(
-        "group flex items-center gap-3 w-full px-3 py-3 rounded-lg text-left transition-all duration-200 outline-none",
-        isActive ? "bg-red-500/10" : "hover:bg-white/5"
-      )}
-    >
-      <div className={cn(
-        "w-8 h-8 flex items-center justify-center rounded-md transition-colors",
-        isActive ? "bg-red-500 text-white" : "bg-white/10 text-gray-400 group-hover:text-white"
-      )}>
-        {icon}
-      </div>
-      <div className="flex flex-col">
-        <span className={cn("text-sm font-medium", isActive ? "text-red-100" : "text-gray-200")}>{label}</span>
-        <span className="text-xs text-gray-500">{subLabel}</span>
-      </div>
-      {isActive && (
-        <motion.div
-          layoutId="active-indicator"
-          className="ml-auto text-red-500"
-        >
-          <ArrowRight className="w-4 h-4" />
-        </motion.div>
-      )}
-    </a>
-  );
-}
-
-function Feature({ icon, title, desc, delay }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 20 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.5, delay }}
-      className="p-6 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors text-left"
-    >
-      <div className="mb-4 p-2 bg-white/5 rounded-lg w-fit">{icon}</div>
-      <h3 className="text-lg font-semibold text-white mb-2">{title}</h3>
-      <p className="text-sm text-gray-400 leading-relaxed">{desc}</p>
-    </motion.div>
-  );
-}
-
-// Normalized Icons (24x24 ViewBox)
-const WindowsIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M0 3.44L10.98 2v9.39h-11V3.44zm12.06-1.6L24 0v11.39h-11.94V1.84zM0 12.55h10.98v9.28L0 20.44v-7.89zm12.06 0H24V24l-11.94-1.66V12.55z" />
-  </svg>
-);
-
-const AppleIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M18.71 19.5c-.83 1.24-1.71 2.45-3.05 2.47-1.34.03-1.77-.79-3.29-.79-1.53 0-2 .77-3.27.82-1.31.05-2.3-1.32-3.14-2.53C4.25 17 2.94 12.45 4.7 9.39c.87-1.52 2.43-2.48 4.12-2.51 1.28-.02 2.5.87 3.29.87.78 0 2.26-1.07 3.81-.91.65.03 2.47.26 3.64 1.98-.09.06-2.17 1.28-2.15 3.81.03 3.02 2.65 4.03 2.68 4.04-.03.07-.42 1.44-1.38 2.83M13 3.5c.55-.67.92-1.56.81-2.43-.8.03-1.72.53-2.27 1.18-.49.57-.92 1.53-.81 2.35.88.07 1.78-.42 2.27-1.1" />
-  </svg>
-);
-
-const LinuxIcon = () => (
-  <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
-    <path d="M12 20.52c4.13 0 5.16-1.67 5.16-1.67.22-1.55.05-2.52.05-2.52 1.55-.42 1.6-2.22 1.6-2.22-.05-2.92-2.1-4.65-2.1-4.65-.57-3.55-2.42-7.4-4.7-7.4-2.28 0-4.13 3.85-4.7 7.4 0 0-2.05 1.73-2.1 4.65 0 0 .05 1.8 1.6 2.22 0 0-.17.97.05 2.52 0 0 1.03 1.67 5.16 1.67zM7.5 13.5c0-1.65.9-3 2-3s2 1.35 2 3c0 1.65-.9 3-2 3s-2-1.35-2-3zm7 0c0-1.65.9-3 2-3s2 1.35 2 3c0 1.65-.9 3-2 3s-2-1.35-2-3z" />
-  </svg>
-);
 
 export default App;
-
