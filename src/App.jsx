@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
-import { motion, useScroll, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import {
     Download, Wifi, Shield, Battery,
-    ChevronDown, Smartphone, Settings, ArrowRight
+    ChevronDown, Smartphone, Settings
 } from 'lucide-react';
 
 // Smooth stagger animation config
@@ -26,20 +26,9 @@ const fadeInUp = {
     }
 };
 
-const scaleIn = {
-    hidden: { opacity: 0, scale: 0.95 },
-    show: {
-        opacity: 1,
-        scale: 1,
-        transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }
-    }
-};
-
 function App() {
     const [hoveredFeature, setHoveredFeature] = useState(null);
     const [downloadUnlocked, setDownloadUnlocked] = useState(false);
-    const { scrollYProgress } = useScroll();
-    const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
     const features = [
         {
@@ -77,73 +66,28 @@ function App() {
     return (
         <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
 
-            {/* Animated background gradient that responds to scroll */}
+            {/* Static background gradient - optimized for mobile */}
             <div className="fixed inset-0 pointer-events-none">
-                <motion.div
-                    className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[150px]"
-                    animate={{
-                        x: [0, 50, 0],
-                        y: [0, 30, 0],
-                    }}
-                    transition={{
-                        duration: 20,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                />
-                <motion.div
-                    className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-[120px]"
-                    animate={{
-                        x: [0, -30, 0],
-                        y: [0, -20, 0],
-                    }}
-                    transition={{
-                        duration: 15,
-                        repeat: Infinity,
-                        ease: "linear"
-                    }}
-                />
+                <div className="absolute top-0 left-1/4 w-[600px] h-[600px] bg-emerald-500/5 rounded-full blur-[150px]" />
+                <div className="absolute bottom-0 right-1/4 w-[400px] h-[400px] bg-teal-500/5 rounded-full blur-[120px]" />
             </div>
 
-            {/* Header with scroll-based background */}
-            <motion.header
-                className="fixed top-0 left-0 right-0 z-50 border-b border-transparent"
-                style={{
-                    backgroundColor: `rgba(10, 10, 10, ${headerOpacity})`,
-                    backdropFilter: 'blur(12px)',
-                    borderColor: `rgba(255, 255, 255, 0.05)`
-                }}
-            >
+            {/* Header */}
+            <header className="fixed top-0 left-0 right-0 z-50 bg-[#0a0a0a]/80 backdrop-blur-lg border-b border-white/5">
                 <div className="max-w-6xl mx-auto px-6 py-4 flex items-center justify-between">
-                    <motion.div
-                        className="flex items-center gap-3"
-                        initial={{ opacity: 0, x: -20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                    >
+                    <div className="flex items-center gap-3">
                         <img src="/connex-icon.png" alt="Connex" className="w-10 h-10 rounded-xl" />
                         <span className="text-xl font-bold tracking-tight">Connex</span>
-                    </motion.div>
+                    </div>
 
-                    <motion.a
+                    <a
                         href="#download"
-                        className="group relative px-5 py-2.5 rounded-full bg-emerald-500 text-sm font-semibold overflow-hidden"
-                        initial={{ opacity: 0, x: 20 }}
-                        animate={{ opacity: 1, x: 0 }}
-                        transition={{ duration: 0.5 }}
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
+                        className="px-5 py-2.5 rounded-full bg-emerald-500 text-sm font-semibold hover:bg-emerald-600 transition-colors"
                     >
-                        <span className="relative z-10">Download</span>
-                        <motion.div
-                            className="absolute inset-0 bg-emerald-400"
-                            initial={{ x: '-100%' }}
-                            whileHover={{ x: 0 }}
-                            transition={{ duration: 0.3 }}
-                        />
-                    </motion.a>
+                        Download
+                    </a>
                 </div>
-            </motion.header>
+            </header>
 
             {/* Hero Section */}
             <section className="relative z-10 min-h-screen flex items-center pt-20">
@@ -161,11 +105,7 @@ function App() {
                             variants={fadeInUp}
                             className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-emerald-500/10 border border-emerald-500/20 mb-6"
                         >
-                            <motion.div
-                                className="w-2 h-2 rounded-full bg-emerald-500"
-                                animate={{ opacity: [1, 0.5, 1] }}
-                                transition={{ duration: 2, repeat: Infinity }}
-                            />
+                            <div className="w-2 h-2 rounded-full bg-emerald-500" />
                             <span className="text-sm text-emerald-400 font-medium">Android Only • v1.0.0</span>
                         </motion.div>
 
@@ -192,17 +132,10 @@ function App() {
                         <motion.div variants={fadeInUp} className="mb-10">
                             <motion.a
                                 href="#download"
-                                className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-emerald-500 text-lg font-semibold relative overflow-hidden"
-                                whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(16, 185, 129, 0.3)" }}
-                                whileTap={{ scale: 0.98 }}
+                                className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-emerald-500 text-lg font-semibold hover:bg-emerald-600 transition-colors"
                             >
-                                <Download className="w-5 h-5 relative z-10" />
-                                <span className="relative z-10">Download APK</span>
-                                <motion.div
-                                    className="absolute right-6 opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all duration-300"
-                                >
-                                    <ArrowRight className="w-5 h-5" />
-                                </motion.div>
+                                <Download className="w-5 h-5" />
+                                <span>Download APK</span>
                             </motion.a>
                         </motion.div>
 
@@ -426,8 +359,8 @@ function App() {
                                     setDownloadUnlocked(true);
                                 }}
                                 className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
-                                        ? 'bg-emerald-600 text-white cursor-default'
-                                        : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
+                                    ? 'bg-emerald-600 text-white cursor-default'
+                                    : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
                                     }`}
                             >
                                 <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
