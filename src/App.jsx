@@ -450,7 +450,7 @@ function App() {
 
                         {/* Download Button */}
                         <motion.a
-                            href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/connext/connex.apk"
+                            href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
                             className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold relative overflow-hidden"
                             whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.2)" }}
                             whileTap={{ scale: 0.98 }}
