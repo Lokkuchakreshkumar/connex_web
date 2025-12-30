@@ -37,6 +37,7 @@ const scaleIn = {
 
 function App() {
     const [hoveredFeature, setHoveredFeature] = useState(null);
+    const [downloadUnlocked, setDownloadUnlocked] = useState(false);
     const { scrollYProgress } = useScroll();
     const headerOpacity = useTransform(scrollYProgress, [0, 0.1], [0, 1]);
 
@@ -399,79 +400,69 @@ function App() {
             {/* Download Section */}
             <section id="download" className="relative z-10 py-24 px-6">
                 <div className="max-w-3xl mx-auto">
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.95 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true, margin: "-100px" }}
-                        transition={{ duration: 0.6 }}
-                        className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 border border-emerald-500/20 p-8 sm:p-12 text-center"
-                    >
-                        {/* Animated gradient border */}
-                        <motion.div
-                            className="absolute inset-0 rounded-3xl opacity-50"
-                            style={{
-                                background: 'linear-gradient(90deg, transparent, rgba(16, 185, 129, 0.3), transparent)',
-                                backgroundSize: '200% 100%'
-                            }}
-                            animate={{
-                                backgroundPosition: ['200% 0', '-200% 0']
-                            }}
-                            transition={{ duration: 5, repeat: Infinity, ease: "linear" }}
-                        />
+                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 border border-emerald-500/20 p-8 sm:p-12 text-center">
 
                         {/* Icon */}
-                        <motion.img
+                        <img
                             src="/connex-icon.png"
                             alt="Connex"
                             className="w-20 h-20 mx-auto mb-6 rounded-2xl"
-                            whileHover={{ scale: 1.05, rotate: 3 }}
-                            transition={{ type: "spring", stiffness: 400, damping: 10 }}
                         />
 
-                        <motion.h2
-                            className="text-3xl sm:text-4xl font-bold text-white mb-4"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.2 }}
-                        >
+                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
                             Download Connex
-                        </motion.h2>
+                        </h2>
 
-                        <motion.p
-                            className="text-gray-400 max-w-md mx-auto mb-8"
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.3 }}
-                        >
+                        <p className="text-gray-400 max-w-md mx-auto mb-8">
                             Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
-                        </motion.p>
+                        </p>
 
-                        {/* Download Button */}
-                        <motion.a
-                            href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
-                            className="group inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold relative overflow-hidden"
-                            whileHover={{ scale: 1.02, boxShadow: "0 20px 40px -10px rgba(255, 255, 255, 0.2)" }}
-                            whileTap={{ scale: 0.98 }}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.4 }}
-                        >
-                            <Download className="w-5 h-5" />
-                            Download APK
-                            <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
-                        </motion.a>
+                        {/* Step 1: Join Telegram */}
+                        <div className="mb-6">
+                            <p className="text-sm text-gray-500 mb-3">Step 1: Join our community to unlock download</p>
+                            <button
+                                onClick={() => {
+                                    window.open('https://t.me/+PH-r_FNrnw1jYTQ1', '_blank');
+                                    setDownloadUnlocked(true);
+                                }}
+                                className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
+                                        ? 'bg-emerald-600 text-white cursor-default'
+                                        : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
+                                    }`}
+                            >
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                                </svg>
+                                {downloadUnlocked ? 'Joined ✓' : 'Join Telegram Group'}
+                            </button>
+                        </div>
+
+                        {/* Step 2: Download Button - Only visible after joining */}
+                        {downloadUnlocked ? (
+                            <div>
+                                <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
+                                <a
+                                    href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
+                                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                                >
+                                    <Download className="w-5 h-5" />
+                                    Download APK
+                                    <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
+                                </a>
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="text-sm text-gray-600 mb-3">Step 2: Download (locked)</p>
+                                <div className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gray-800 text-gray-500 font-semibold cursor-not-allowed">
+                                    <Download className="w-5 h-5" />
+                                    Download APK
+                                    <span className="px-2 py-1 rounded-lg bg-white/5 text-xs">🔒</span>
+                                </div>
+                            </div>
+                        )}
 
                         {/* Requirements */}
-                        <motion.div
-                            className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500"
-                            initial={{ opacity: 0 }}
-                            whileInView={{ opacity: 1 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: 0.5 }}
-                        >
+                        <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500">
                             <span className="flex items-center gap-2">
                                 <Smartphone className="w-4 h-4" />
                                 Android 8.0+
@@ -480,8 +471,8 @@ function App() {
                             <span>&lt;10MB</span>
                             <span>•</span>
                             <span>No root required</span>
-                        </motion.div>
-                    </motion.div>
+                        </div>
+                    </div>
                 </div>
             </section>
 
