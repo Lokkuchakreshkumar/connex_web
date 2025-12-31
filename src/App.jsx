@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import {
     Download, Wifi, Shield, Battery,
-    ChevronDown, Smartphone, Settings
+    ChevronDown, Smartphone, Settings,
+    Zap, Lock, User
 } from 'lucide-react';
 
 // Smooth stagger animation config
@@ -62,6 +63,129 @@ function App() {
         { num: "02", title: "Add Credentials", desc: "Enter your captive portal username and password" },
         { num: "03", title: "Forget About It", desc: "Connex handles everything automatically from now on" }
     ];
+
+    const faqs = [
+        {
+            question: "Who the hell created Connex?",
+            answer: (
+                <div className="space-y-2">
+                    <p>
+                        Connex was designed and architected by <a href="https://chakresh.vercel.app" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-emerald-500/50 text-glint hover:opacity-80 transition-opacity">Chakresh</a>.
+                    </p>
+                    <p>
+                        AI was used to write the Kotlin code in full, while the ideas, system architecture, network logic, feature flow, and behavior were defined separately and then implemented through AI.
+                    </p>
+                </div>
+            ),
+            type: "creator",
+            icon: <User className="w-5 h-5 text-emerald-400" />
+        },
+        {
+            question: "How to download Connex?",
+            answer: (
+                <div className="space-y-2">
+                    <p>Connex is not available on the Play Store.</p>
+                    <ul className="list-disc list-inside space-y-1 ml-2 text-gray-400">
+                        <li>Join the official Telegram group.</li>
+                        <li>Download the Connex APK.</li>
+                        <li>Install it manually on your Android device.</li>
+                    </ul>
+                    <p className="mt-2 text-sm text-gray-500">If you face any issues: Visit Chakresh’s portfolio, scroll to the bottom, and submit feedback there.</p>
+                </div>
+            ),
+            type: "normal"
+        },
+        {
+            question: "How to use Connex?",
+            answer: (
+                <>
+                    <p className="mb-3">Connex automates captive-portal Wi-Fi logins.</p>
+                    <div className="grid sm:grid-cols-2 gap-2 text-sm text-gray-400">
+                        <div className="flex items-center gap-2"><span>•</span> Automatic supported Wi-Fi detection</div>
+                        <div className="flex items-center gap-2"><span>•</span> Stored credential login</div>
+                        <div className="flex items-center gap-2"><span>•</span> Multiple account profiles</div>
+                        <div className="flex items-center gap-2"><span>•</span> Polling-based session monitoring</div>
+                        <div className="flex items-center gap-2"><span>•</span> Automatic account switching</div>
+                        <div className="flex items-center gap-2"><span>•</span> Manual connect mode</div>
+                    </div>
+                </>
+            ),
+            type: "normal"
+        },
+        {
+            question: "How to go Stealth Mode",
+            answer: (
+                <div className="space-y-3">
+                    <p><strong>Process:</strong></p>
+                    <ol className="list-decimal list-inside space-y-1 ml-2 text-gray-400">
+                        <li>Add your primary account credentials.</li>
+                        <li>Click Add to create multiple additional profiles.</li>
+                    </ol>
+                    <div className="p-3 rounded-lg bg-purple-500/10 border border-purple-500/20">
+                        <p className="italic text-purple-200/80">
+                            When one account hits the Wi-Fi provider’s usage or session limit,
+                            Connex automatically switches to the next account.
+                            This continues for any number of added accounts, without user interaction.
+                        </p>
+                    </div>
+                    <p className="font-semibold text-purple-400">That behavior is what Stealth Mode means.</p>
+                </div>
+            ),
+            type: "stealth",
+            icon: <Zap className="w-5 h-5 text-purple-400" />
+        },
+        {
+            question: "What is Polling?",
+            answer: (
+                <p>
+                    Polling means Connex periodically checks the network and session status.
+                    It keeps asking: <span className="text-emerald-400">"Is the session still active?"</span> or <span className="text-emerald-400">"Has authentication expired?"</span>
+                    If not, Connex re-authenticates automatically.
+                </p>
+            ),
+            type: "normal"
+        },
+        {
+            question: "What is Manual Connect Mode?",
+            answer: (
+                <>
+                    <p className="mb-3">Manual Connect Mode lets the user trigger login manually.</p>
+                    <div className="flex flex-wrap gap-2">
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs">No background retries</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs">One login attempt</span>
+                        <span className="px-3 py-1 rounded-full bg-white/5 border border-white/10 text-xs">Full user control</span>
+                    </div>
+                </>
+            ),
+            type: "normal"
+        },
+        {
+            question: "Why is Connex not open-source?",
+            answer: (
+                <div className="space-y-3">
+                    <p>
+                        Connex automates captive-portal logins and account switching.
+                        If the source code were public, it could be easily copied, modified, and abused at scale.
+                    </p>
+                    <div className="pl-4 border-l-2 border-rose-500/30">
+                        <p className="text-sm text-gray-400 italic mb-1">Example:</p>
+                        <p>An open-source fork could remove limits or safeguards and be mass-used to bypass Wi-Fi provider restrictions. That would quickly get Connex blocked or shut down.</p>
+                    </div>
+                    <p className="font-medium text-rose-200">
+                        In short: Connex is closed-source to prevent misuse, protect responsible usage, and keep the app functional long-term.
+                    </p>
+                </div>
+            ),
+            type: "warning",
+            icon: <Lock className="w-5 h-5 text-rose-400" />
+        }
+    ];
+
+    const [openFaqIndex, setOpenFaqIndex] = useState(null);
+
+    const toggleFaq = (index) => {
+        setOpenFaqIndex(openFaqIndex === index ? null : index);
+    };
 
     return (
         <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
@@ -207,6 +331,85 @@ function App() {
                 </motion.div>
             </section>
 
+            {/* Download Section - Moved to Top */}
+            <section id="download" className="relative z-10 py-24 px-6">
+                <div className="max-w-3xl mx-auto">
+                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 border border-emerald-500/20 p-8 sm:p-12 text-center">
+
+                        {/* Icon */}
+                        <img
+                            src="/connex-icon.png"
+                            alt="Connex"
+                            className="w-20 h-20 mx-auto mb-6 rounded-2xl"
+                        />
+
+                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
+                            Download Connex
+                        </h2>
+
+                        <p className="text-gray-400 max-w-md mx-auto mb-8">
+                            Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
+                        </p>
+
+                        {/* Step 1: Join Telegram */}
+                        <div className="mb-6">
+                            <p className="text-sm text-gray-500 mb-3">Step 1: Join our community to unlock download</p>
+                            <button
+                                onClick={() => {
+                                    window.open('https://t.me/+PH-r_FNrnw1jYTQ1', '_blank');
+                                    setDownloadUnlocked(true);
+                                }}
+                                className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
+                                    ? 'bg-emerald-600 text-white cursor-default'
+                                    : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
+                                    }`}
+                            >
+                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                                </svg>
+                                {downloadUnlocked ? 'Joined ✓' : 'Join Telegram Group'}
+                            </button>
+                        </div>
+
+                        {/* Step 2: Download Button - Only visible after joining */}
+                        {downloadUnlocked ? (
+                            <div>
+                                <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
+                                <a
+                                    href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
+                                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                                >
+                                    <Download className="w-5 h-5" />
+                                    Download APK
+                                    <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
+                                </a>
+                            </div>
+                        ) : (
+                            <div>
+                                <p className="text-sm text-gray-600 mb-3">Step 2: Download (locked)</p>
+                                <div className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gray-800 text-gray-500 font-semibold cursor-not-allowed">
+                                    <Download className="w-5 h-5" />
+                                    Download APK
+                                    <span className="px-2 py-1 rounded-lg bg-white/5 text-xs">🔒</span>
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Requirements */}
+                        <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500">
+                            <span className="flex items-center gap-2">
+                                <Smartphone className="w-4 h-4" />
+                                Android 8.0+
+                            </span>
+                            <span>•</span>
+                            <span>&lt;10MB</span>
+                            <span>•</span>
+                            <span>No root required</span>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
             {/* Features Section */}
             <section className="relative z-10 py-24 px-6">
                 <div className="max-w-6xl mx-auto">
@@ -331,80 +534,76 @@ function App() {
             </section>
 
             {/* Download Section */}
-            <section id="download" className="relative z-10 py-24 px-6">
+
+
+            {/* FAQ Section */}
+            <section className="relative z-10 py-24 px-6">
                 <div className="max-w-3xl mx-auto">
-                    <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-emerald-500/10 via-transparent to-teal-500/10 border border-emerald-500/20 p-8 sm:p-12 text-center">
+                    <div className="text-center mb-16">
+                        <h2 className="text-3xl sm:text-4xl font-bold mb-4">Frequently Asked Questions</h2>
+                        <p className="text-gray-500">Everything you need to know about Connex</p>
+                    </div>
 
-                        {/* Icon */}
-                        <img
-                            src="/connex-icon.png"
-                            alt="Connex"
-                            className="w-20 h-20 mx-auto mb-6 rounded-2xl"
-                        />
+                    <div className="space-y-4">
+                        {faqs.map((faq, index) => {
+                            const isOpen = openFaqIndex === index;
 
-                        <h2 className="text-3xl sm:text-4xl font-bold text-white mb-4">
-                            Download Connex
-                        </h2>
+                            // Dynamic styles based on type
+                            let containerClass = "bg-white/[0.02] border-white/5 hover:bg-white/[0.04]";
+                            let titleClass = "text-white";
 
-                        <p className="text-gray-400 max-w-md mx-auto mb-8">
-                            Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
-                        </p>
+                            if (faq.type === 'creator') {
+                                containerClass = "bg-emerald-500/5 border-emerald-500/20 hover:bg-emerald-500/10";
+                                titleClass = "text-emerald-400";
+                            } else if (faq.type === 'stealth') {
+                                containerClass = "bg-gradient-to-r from-purple-900/20 to-blue-900/20 border-purple-500/30 hover:from-purple-900/30 hover:to-blue-900/30";
+                                titleClass = "text-transparent bg-clip-text bg-gradient-to-r from-purple-400 to-blue-400";
+                            } else if (faq.type === 'warning') {
+                                containerClass = "bg-rose-500/5 border-rose-500/20 hover:bg-rose-500/10";
+                                titleClass = "text-rose-400";
+                            }
 
-                        {/* Step 1: Join Telegram */}
-                        <div className="mb-6">
-                            <p className="text-sm text-gray-500 mb-3">Step 1: Join our community to unlock download</p>
-                            <button
-                                onClick={() => {
-                                    window.open('https://t.me/+PH-r_FNrnw1jYTQ1', '_blank');
-                                    setDownloadUnlocked(true);
-                                }}
-                                className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
-                                    ? 'bg-emerald-600 text-white cursor-default'
-                                    : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
-                                    }`}
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                                </svg>
-                                {downloadUnlocked ? 'Joined ✓' : 'Join Telegram Group'}
-                            </button>
-                        </div>
-
-                        {/* Step 2: Download Button - Only visible after joining */}
-                        {downloadUnlocked ? (
-                            <div>
-                                <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
-                                <a
-                                    href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
-                                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                            return (
+                                <motion.div
+                                    key={index}
+                                    initial={false}
+                                    animate={{ backgroundColor: isOpen ? "rgba(255,255,255,0.05)" : undefined }}
+                                    className={`rounded-2xl border overflow-hidden transition-colors duration-300 ${containerClass}`}
                                 >
-                                    <Download className="w-5 h-5" />
-                                    Download APK
-                                    <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
-                                </a>
-                            </div>
-                        ) : (
-                            <div>
-                                <p className="text-sm text-gray-600 mb-3">Step 2: Download (locked)</p>
-                                <div className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gray-800 text-gray-500 font-semibold cursor-not-allowed">
-                                    <Download className="w-5 h-5" />
-                                    Download APK
-                                    <span className="px-2 py-1 rounded-lg bg-white/5 text-xs">🔒</span>
-                                </div>
-                            </div>
-                        )}
+                                    <button
+                                        onClick={() => toggleFaq(index)}
+                                        className="w-full flex items-center justify-between p-6 text-left focus:outline-none"
+                                    >
+                                        <span className={`text-lg font-semibold flex items-center gap-3 ${titleClass}`}>
+                                            {faq.icon && <span>{faq.icon}</span>}
+                                            {faq.question}
+                                        </span>
+                                        <motion.div
+                                            animate={{ rotate: isOpen ? 180 : 0 }}
+                                            transition={{ duration: 0.2 }}
+                                            className={`p-2 rounded-full ${isOpen ? 'bg-white/10' : 'bg-transparent'}`}
+                                        >
+                                            <ChevronDown className={`w-5 h-5 ${faq.type === 'stealth' ? 'text-purple-400' : 'text-gray-400'}`} />
+                                        </motion.div>
+                                    </button>
 
-                        {/* Requirements */}
-                        <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500">
-                            <span className="flex items-center gap-2">
-                                <Smartphone className="w-4 h-4" />
-                                Android 8.0+
-                            </span>
-                            <span>•</span>
-                            <span>&lt;10MB</span>
-                            <span>•</span>
-                            <span>No root required</span>
-                        </div>
+                                    <AnimatePresence initial={false}>
+                                        {isOpen && (
+                                            <motion.div
+                                                initial={{ height: 0, opacity: 0 }}
+                                                animate={{ height: "auto", opacity: 1 }}
+                                                exit={{ height: 0, opacity: 0 }}
+                                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                            >
+                                                <div className="px-6 pb-6 text-gray-400 leading-relaxed border-t border-white/5 pt-4">
+                                                    {faq.answer}
+                                                </div>
+                                            </motion.div>
+                                        )}
+                                    </AnimatePresence>
+                                </motion.div>
+                            );
+                        })}
                     </div>
                 </div>
             </section>
@@ -427,7 +626,7 @@ function App() {
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        v1.0.0 • Made for hassle-free WiFi
+                        v1.0.0 • Made with love by <a href="https://chakresh.vercel.app" target="_blank" rel="noopener noreferrer" className="font-bold text-glint-rose hover:opacity-80 transition-opacity">Chakresh</a>
                     </motion.span>
                 </div>
             </footer>
