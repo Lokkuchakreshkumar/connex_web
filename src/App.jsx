@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import {
     Download, Wifi, Shield, Battery,
     ChevronDown, Smartphone, Settings,
-    Zap, Lock, User
+    Zap, Lock, User, ExternalLink
 } from 'lucide-react';
 
 // Smooth stagger animation config
@@ -25,6 +25,34 @@ const fadeInUp = {
         y: 0,
         transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] }
     }
+};
+
+// Wave Link Component
+const WaveLink = ({ href, text, type = 'emerald' }) => {
+    return (
+        <a
+            href={href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`inline-flex text-lg items-center gap-1 font-bold hover:opacity-80 transition-opacity whitespace-nowrap underline decoration-2 underline-offset-4 ${type === 'emerald' ? 'decoration-emerald-500' : 'decoration-rose-500'}`}
+        >
+            <span>
+                {text.split('').map((char, index) => (
+                    <span
+                        key={index}
+                        className="wave-char"
+                        style={{
+                            animation: `${type === 'emerald' ? 'wave-emerald' : 'wave-rose'} 3s infinite ease-in-out`,
+                            animationDelay: `${index * 0.15}s`
+                        }}
+                    >
+                        {char === ' ' ? '\u00A0' : char}
+                    </span>
+                ))}
+            </span>
+            <ExternalLink className={`w-5 h-5 ${type === 'emerald' ? 'text-emerald-400' : 'text-rose-400'}`} />
+        </a>
+    );
 };
 
 function App() {
@@ -70,7 +98,7 @@ function App() {
             answer: (
                 <div className="space-y-2">
                     <p>
-                        Connex was designed and architected by <a href="https://chakresh.vercel.app" target="_blank" rel="noopener noreferrer" className="font-bold underline decoration-emerald-500/50 text-glint hover:opacity-80 transition-opacity">Chakresh</a>.
+                        Connex was designed and architected by <WaveLink href="https://chakresh.vercel.app" text="Chakresh" type="emerald" />.
                     </p>
                     <p>
                         AI was used to write the Kotlin code in full, while the ideas, system architecture, network logic, feature flow, and behavior were defined separately and then implemented through AI.
@@ -186,6 +214,8 @@ function App() {
     const toggleFaq = (index) => {
         setOpenFaqIndex(openFaqIndex === index ? null : index);
     };
+
+
 
     return (
         <div className="min-h-screen w-full bg-[#0a0a0a] text-white font-sans overflow-x-hidden">
@@ -376,7 +406,8 @@ function App() {
                             <div>
                                 <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
                                 <a
-                                    href="https://cdn.jsdelivr.net/gh/Lokkuchakreshkumar/connex_web@master/app-debug.apk"
+                                    href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/connext/connex.apk
+"
                                     className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
                                 >
                                     <Download className="w-5 h-5" />
@@ -621,12 +652,12 @@ function App() {
                         <span className="font-semibold">Connex</span>
                     </motion.div>
                     <motion.span
-                        className="text-sm text-gray-500"
+                        className="text-lg text-gray-500"
                         initial={{ opacity: 0 }}
                         whileInView={{ opacity: 1 }}
                         viewport={{ once: true }}
                     >
-                        v1.0.0 • Made with love by <a href="https://chakresh.vercel.app" target="_blank" rel="noopener noreferrer" className="font-bold text-glint-rose hover:opacity-80 transition-opacity">Chakresh</a>
+                        v1.0.0 • Made with love by <WaveLink href="https://chakresh.vercel.app" text="Chakresh" type="rose" />
                     </motion.span>
                 </div>
             </footer>
