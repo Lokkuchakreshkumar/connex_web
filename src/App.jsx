@@ -406,7 +406,7 @@ function App() {
                             <div>
                                 <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
                                 <a
-                                    href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/connext/connex.apk
+                                    href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/v1.4.15/Connex.apk
 "
                                     className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
                                 >
