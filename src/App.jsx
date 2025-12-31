@@ -58,6 +58,18 @@ const WaveLink = ({ href, text, type = 'emerald' }) => {
 function App() {
     const [hoveredFeature, setHoveredFeature] = useState(null);
     const [downloadUnlocked, setDownloadUnlocked] = useState(false);
+    const [os, setOs] = useState('loading');
+
+    React.useEffect(() => {
+        const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+        if (/android/i.test(userAgent)) {
+            setOs('android');
+        } else if (/iPad|iPhone|iPod/.test(userAgent) && !window.MSStream) {
+            setOs('ios');
+        } else {
+            setOs('desktop');
+        }
+    }, []);
 
     const features = [
         {
@@ -377,66 +389,107 @@ function App() {
                             Download Connex
                         </h2>
 
-                        <p className="text-gray-400 max-w-md mx-auto mb-8">
-                            Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
-                        </p>
-
-                        {/* Step 1: Join Telegram */}
-                        <div className="mb-6">
-                            <p className="text-sm text-gray-500 mb-3">Step 1: Join our community to unlock download</p>
-                            <button
-                                onClick={() => {
-                                    window.open('https://t.me/+PH-r_FNrnw1jYTQ1', '_blank');
-                                    setDownloadUnlocked(true);
-                                }}
-                                className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
-                                    ? 'bg-emerald-600 text-white cursor-default'
-                                    : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
-                                    }`}
-                            >
-                                <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
-                                    <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
-                                </svg>
-                                {downloadUnlocked ? 'Joined ✓' : 'Join Telegram Group'}
-                            </button>
-                        </div>
-
-                        {/* Step 2: Download Button - Only visible after joining */}
-                        {downloadUnlocked ? (
-                            <div>
-                                <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
-                                <a
-                                    href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/v1.4.15/Connex.apk
-"
-                                    className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
-                                >
-                                    <Download className="w-5 h-5" />
-                                    Download APK
-                                    <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
-                                </a>
+                        {os === 'loading' && (
+                            <div className="py-8">
+                                <div className="w-6 h-6 border-2 border-emerald-500 border-t-transparent rounded-full animate-spin mx-auto"></div>
                             </div>
-                        ) : (
-                            <div>
-                                <p className="text-sm text-gray-600 mb-3">Step 2: Download (locked)</p>
-                                <div className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gray-800 text-gray-500 font-semibold cursor-not-allowed">
-                                    <Download className="w-5 h-5" />
-                                    Download APK
-                                    <span className="px-2 py-1 rounded-lg bg-white/5 text-xs">🔒</span>
+                        )}
+
+                        {os === 'android' && (
+                            <>
+                                <p className="text-gray-400 max-w-md mx-auto mb-8">
+                                    Free to use. No ads, no trackers, no subscriptions. Just seamless WiFi connectivity.
+                                </p>
+
+                                {/* Step 1: Join Telegram */}
+                                <div className="mb-6">
+                                    <p className="text-sm text-gray-500 mb-3">Step 1: Join our community to unlock download</p>
+                                    <button
+                                        onClick={() => {
+                                            window.open('https://t.me/+PH-r_FNrnw1jYTQ1', '_blank');
+                                            setDownloadUnlocked(true);
+                                        }}
+                                        className={`inline-flex items-center justify-center gap-3 px-6 py-3 rounded-xl font-semibold transition-colors ${downloadUnlocked
+                                            ? 'bg-emerald-600 text-white cursor-default'
+                                            : 'bg-[#0088cc] text-white hover:bg-[#0077b5] cursor-pointer'
+                                            }`}
+                                    >
+                                        <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                                            <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z" />
+                                        </svg>
+                                        {downloadUnlocked ? 'Joined ✓' : 'Join Telegram Group'}
+                                    </button>
+                                </div>
+
+                                {/* Step 2: Download Button - Only visible after joining */}
+                                {downloadUnlocked ? (
+                                    <div>
+                                        <p className="text-sm text-emerald-400 mb-3">Step 2: Download unlocked!</p>
+                                        <a
+                                            href="https://github.com/Lokkuchakreshkumar/connex_web/releases/download/v1.4.15/Connex.apk"
+                                            className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-white text-black font-semibold hover:bg-gray-100 transition-colors"
+                                        >
+                                            <Download className="w-5 h-5" />
+                                            Download APK
+                                            <span className="px-2 py-1 rounded-lg bg-black/10 text-xs">v1.0.0</span>
+                                        </a>
+                                    </div>
+                                ) : (
+                                    <div>
+                                        <p className="text-sm text-gray-600 mb-3">Step 2: Download (locked)</p>
+                                        <div className="inline-flex items-center justify-center gap-3 px-8 py-4 rounded-xl bg-gray-800 text-gray-500 font-semibold cursor-not-allowed">
+                                            <Download className="w-5 h-5" />
+                                            Download APK
+                                            <span className="px-2 py-1 rounded-lg bg-white/5 text-xs">🔒</span>
+                                        </div>
+                                    </div>
+                                )}
+
+                                {/* Requirements */}
+                                <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500">
+                                    <span className="flex items-center gap-2">
+                                        <Smartphone className="w-4 h-4" />
+                                        Android 8.0+
+                                    </span>
+                                    <span>•</span>
+                                    <span>&lt;10MB</span>
+                                    <span>•</span>
+                                    <span>No root required</span>
+                                </div>
+                            </>
+                        )}
+
+                        {os === 'ios' && (
+                            <div className="space-y-8 py-4">
+                                <div className="space-y-4 text-xl">
+                                    <p className="text-gray-400">iOS users: <span className="italic text-white">“Where’s the app?”</span></p>
+                                    <p className="text-emerald-400 font-bold">Me: “Where’s the freedom?”</p>
+                                </div>
+                                <div className="p-6 rounded-2xl bg-white/[0.03] border border-white/10 max-w-sm mx-auto backdrop-blur-sm">
+                                    <p className="text-gray-400 leading-relaxed">
+                                        Connex requires background WiFi control, which iOS does not support.
+                                    </p>
+                                    <div className="mt-4 inline-flex items-center gap-2 px-3 py-1 rounded-full bg-rose-500/10 border border-rose-500/20 text-rose-400 text-sm font-medium">
+                                        Android Only
+                                    </div>
                                 </div>
                             </div>
                         )}
 
-                        {/* Requirements */}
-                        <div className="mt-8 flex flex-wrap gap-4 justify-center text-sm text-gray-500">
-                            <span className="flex items-center gap-2">
-                                <Smartphone className="w-4 h-4" />
-                                Android 8.0+
-                            </span>
-                            <span>•</span>
-                            <span>&lt;10MB</span>
-                            <span>•</span>
-                            <span>No root required</span>
-                        </div>
+                        {os === 'desktop' && (
+                            <div className="space-y-8 py-4">
+                                <div className="space-y-2 text-xl font-medium">
+                                    <p className="text-gray-300">AI has no chores. I do.</p>
+                                    <p className="text-gray-500">So Connex lives on mobile for now.</p>
+                                </div>
+                                <div className="p-6 rounded-2xl bg-emerald-500/5 border border-emerald-500/10 max-w-sm mx-auto">
+                                    <Smartphone className="w-8 h-8 text-emerald-500 mx-auto mb-3" />
+                                    <p className="text-emerald-400 font-medium text-lg">
+                                        Open this link on your phone to install
+                                    </p>
+                                </div>
+                            </div>
+                        )}
                     </div>
                 </div>
             </section>
@@ -507,10 +560,10 @@ function App() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* How It Works */}
-            <section className="relative z-10 py-24 px-6">
+            < section className="relative z-10 py-24 px-6" >
                 <div className="max-w-4xl mx-auto">
                     <motion.div
                         initial={{ opacity: 0, y: 30 }}
@@ -562,7 +615,7 @@ function App() {
                         ))}
                     </div>
                 </div>
-            </section>
+            </section >
 
             {/* Download Section */}
 
@@ -661,7 +714,7 @@ function App() {
                     </motion.span>
                 </div>
             </footer>
-        </div>
+        </div >
     );
 }
 
